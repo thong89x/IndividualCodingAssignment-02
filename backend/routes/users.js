@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const usersController = require('../controllers/usersController')
-const verifyJWT = require('../middleware/verifyJWT')
+// const verifyJWT = require('../middleware/verifyJWT')
 
 // router.use(verifyJWT)
 

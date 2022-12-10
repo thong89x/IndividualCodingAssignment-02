@@ -18,16 +18,16 @@ const getAllUsers = asyncHandler(async (req, res) => {
     res.json(users)
 })
 const getUserById = asyncHandler(async (req, res) => {
-    // console.log(req.params.id)
-    // // Get all users from MongoDB
-    // const users = await User.findById(req.params.id).select('-password').lean()
+    console.log(req.params.id)
+    // Get all users from MongoDB
+    const users = await User.findById(req.params.id).select('-password').lean()
 
-    // // If no users 
-    // if (!users) {
-    //     return res.status(400).json({ message: 'No users found' })
-    // }
+    // If no users 
+    if (!users) {
+        return res.status(400).json({ message: 'No users found' })
+    }
 
-    // res.json(users)
+    res.json(users)
 })
 const createUser = asyncHandler(async (req, res) => {
     console.log("has req")
@@ -47,7 +47,7 @@ const createUser = asyncHandler(async (req, res) => {
     // Hash password 
     const hashedPwd = await bcrypt.hash(password, 10) // salt rounds
 
-    var userObject = { username, "password": hashedPwd }
+    var userObject = { username, "password": hashedPwd,roles }
 
     const user = await User.create(userObject)
 
@@ -61,32 +61,32 @@ const createUser = asyncHandler(async (req, res) => {
 // @route PATCH /users
 // @access Private
 const updateUser = asyncHandler(async (req, res) => {
-    // const { username, password,roles, active  } = req.body
+    const { username, password,roles, active  } = req.body
+    const id = req.params.id;
+    // Confirm data 
+    if (!id || !username|| typeof active !== 'boolean') {
+        return res.status(400).json({ message: 'All fields except password are required' })
+    }
 
-    // // Confirm data 
-    // if (!id || !username || !roles.length || typeof active !== 'boolean') {
-    //     return res.status(400).json({ message: 'All fields except password are required' })
-    // }
+    // Does the user exist to update?
+    const user = await User.findOne({ username }).exec()
 
-    // // Does the user exist to update?
-    // const user = await User.findOne({ username }).lean().exec()
-
-    // if (!user) {
-    //     return res.status(400).json({ message: 'User not found' })
-    // }
+    if (!user) {
+        return res.status(400).json({ message: 'User not found' })
+    }
 
 
-    // user.roles = roles
-    // user.active = active
+    user.roles = roles
+    user.active = active
 
-    // if (password) {
-    //     // Hash password 
-    //     user.password = await bcrypt.hash(password, 10) // salt rounds 
-    // }
+    if (password) {
+        // Hash password 
+        user.password = await bcrypt.hash(password, 10) // salt rounds 
+    }
 
-    // const updatedUser = await user.save()
+    const updatedUser = await user.save()
 
-    // res.json({ message: `${updatedUser.username} updated` })
+    res.json({ message: `${updatedUser.username} updated` })
 })
 
 // @desc Delete a user
@@ -103,23 +103,23 @@ const deleteUser = asyncHandler(async (req, res) => {
 //     }
 // );
 //     return;
-    // const id  = req.params.id  || req.body.id
-    // console.log(id);
-    // // Confirm data
-    // if (!id) {
-    //     return res.status(400).json({ message: 'User ID Required' })
-    // }
+    const id  = req.params.id  || req.body.id
+    console.log(id);
+    // Confirm data
+    if (!id) {
+        return res.status(400).json({ message: 'User ID Required' })
+    }
 
-    // const user = await User.findById(id).exec()
-    // if (!user) {
-    //     return res.status(400).json({ message: 'User not found' })
-    // }
+    const user = await User.findById(id).exec()
+    if (!user) {
+        return res.status(400).json({ message: 'User not found' })
+    }
 
-    // const result = await user.deleteOne()
+    const result = await user.deleteOne()
 
-    // const reply = `Username ${result.username} with ID ${result._id} deleted`
+    const reply = `Username ${result.username} with ID ${result._id} deleted`
 
-    // res.json(reply)
+    res.json(reply)
 })
 
 module.exports = {
