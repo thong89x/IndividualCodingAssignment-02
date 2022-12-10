@@ -74,8 +74,6 @@ const updateUser = asyncHandler(async (req, res) => {
     if (!user) {
         return res.status(400).json({ message: 'User not found' })
     }
-
-
     user.roles = roles
     user.active = active
 
